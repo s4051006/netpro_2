@@ -1,0 +1,51 @@
+package supanut;
+
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.*;
+
+public class ThreadGetPage extends Thread {
+
+    private String txtUrl;
+    private JEditorPane showPage;
+    private JTextArea showWorkingStatus;
+    private String nameOfWorkingThread;
+
+    public ThreadGetPage(String url, JEditorPane display, JTextArea status, String threadName) {
+        this.txtUrl = url;
+        this.showPage = display;
+        this.showWorkingStatus = status;
+        this.nameOfWorkingThread = threadName;
+    }
+
+    @Override
+    public void run() {
+        String temp = "";
+        temp += "Thread " + nameOfWorkingThread + " : Start";
+        showWorkingStatus.setText(temp);
+        try {
+
+            showPage.setPage(txtUrl);
+            URL obj = new URL(txtUrl);
+            temp += "\nThread " + nameOfWorkingThread + " : Get page URL = " + txtUrl;
+            URLConnection conn = obj.openConnection();
+            Map<String, List<String>> map = conn.getHeaderFields();
+            temp += "\nThread " + nameOfWorkingThread + " : Printing Response Header...";
+            for (Map.Entry<String, List<String>> entry : map.entrySet()) {
+                temp += "\nThread " + nameOfWorkingThread + " : " + entry.getKey() + ", " + entry.getValue();
+            }
+            showWorkingStatus.setText(temp);
+
+        } catch (IOException ex) {
+            Logger.getLogger(ThreadGetPage.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        temp += "\nThread " + nameOfWorkingThread + " : Stop";
+        showWorkingStatus.setText(temp);
+    }
+
+}
